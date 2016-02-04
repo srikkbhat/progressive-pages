@@ -1,0 +1,87 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2016 srikkbhat. All rights reserved.
+-->
+
+<html>
+<head>
+
+  <title>progressive-pages demo</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../paper-styles/color.html">
+  <link rel="import" href="../../paper-toast/paper-toast.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../progressive-pages.html">
+  <link rel="import" href="my-page-three.html">
+  <link rel="import" href="my-page-four.html">
+
+  <style is="custom-style" include="demo-pages-shared-styles"></style>
+</head>
+<body unresolved>
+  <div class="vertical-section-container centered">
+    <h3>progressive-pages shows only one of its children at a time. And lazy loads the items
+        in the path attribute</h3>
+    <demo-snippet>
+      <template>
+        <style is="custom-style">
+          progressive-pages {
+            width: 100%;
+            height: 200px;
+            font-size: 50px;
+            color: white;
+            text-align: center;
+          }
+        </style>
+        <p>Click on a page to advance to the next one.</p>
+        <progressive-pages selected="0">
+          <my-page-one path$="my-page-one.html"></my-page-one>
+          <my-page-two path$="my-page-two.html"></my-page-two>
+          <!--my-page-three pre imported with path attribute -->
+          <my-page-three path$="my-page-three.html"></my-page-three>
+          <!--my-page-four pre imported withtout path attribute -->
+          <my-page-four></my-page-four>
+          <!--my-page-five has not valid import -->
+          <my-page-five path$="my-page-five.html"></my-page-five>
+        </progressive-pages>
+        <paper-toast
+          id="toastSuccess"
+          text="Import successful"></paper-toast>
+        <paper-toast
+          id="toastError"
+          text="Import failed"></paper-toast>
+        <script>
+          window.addEventListener('WebComponentsReady', function() {
+            // imports are loaded and elements have been registered
+
+            var pages = document.querySelector('progressive-pages');
+            var success = document.querySelector('#toastSuccess');
+            var error = document.querySelector('#toastError');
+
+            document.addEventListener('click', function(e) {
+              pages.selectNext();
+            });
+
+            document.addEventListener('progressive-load-complete', function(e) {
+              success.show();
+            });
+
+            document.addEventListener('progressive-load-error', function(e) {
+              error.show();
+            });
+
+          });
+
+        </script>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!--
+@license
+Copyright (c) 2016 srikkbhat. All rights reserved.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<script>
+
+  var ProgressivePages = ProgressivePages || {};
+
+  /**
+  Use `ProgressivePages.PageBehavior` to implement a page to be lazy loaded by `progressive-pages`
+
+  Example:
+
+            Polymer({
+              is: 'my-page-one',
+              behaviors: [
+                ProgressivePages.PageBehavior
+              ]
+            });
+
+  @demo demo/index.html
+  @polymerBehavior ProgressivePages.PageBehavior
+  */
+
+  ProgressivePages.PageBehavior = {
+
+    properties: {
+
+      /**
+       * The default value  of `true` is applied when the element is imported.
+       */
+      imported: {
+        readOnly: true,
+        type: Boolean,
+        value: true
+      }
+    }
+  }
+
+</script>

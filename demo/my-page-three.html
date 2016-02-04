@@ -1,0 +1,29 @@
+<!--
+@license
+Copyright (c) 2016 srikkbhat. All rights reserved.
+-->
+<link rel="import" href="../../paper-styles/color.html">
+<link rel="import" href="../progressive-page-behavior.html">
+
+<dom-module id="my-page-three">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 80px 0;
+        background-color: var(--google-green-500);
+      }
+    </style>
+    <div>Page three</div>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: 'my-page-three',
+        behaviors: [
+          ProgressivePages.PageBehavior
+        ]
+      });
+    })();
+  </script>
+</dom-module>

@@ -1,0 +1,135 @@
+<!--
+@license
+Copyright (c) 2016 srikkbhat. All rights reserved.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../iron-selector/iron-selectable.html">
+
+<!--
+`progressive-pages` is used to select one of its children to show. One use is to cycle through a list of
+children "pages". It attempts to import the selected element using path attribute if provided.
+
+Example:
+
+    <progressive-pages selected="0">
+      <my-page-one path$="path/to/my-page-one.html"></my-page-one>
+      <my-page-two path$="path/to/my-page-two.html"></div>
+      <my-page-three path$="path/to/my-page-three.html"></my-page-three>
+    </progressive-pages>
+
+    <script>
+      document.addEventListener('click', function(e) {
+        var pages = document.querySelector('progressive-pages');
+        pages.selectNext();
+      });
+    </script>
+
+@demo demo/index.html
+-->
+
+<dom-module id="progressive-pages">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
+
+    <content></content>
+
+  </template>
+  <script>
+  (function() {
+
+    Polymer({
+
+      is: 'progressive-pages',
+
+      behaviors: [
+        Polymer.IronResizableBehavior,
+        Polymer.IronSelectableBehavior
+      ],
+
+      properties: {
+
+        /**
+         * As the selected page is the only one visible, activateEvent is both non-sensical and problematic;
+         * e.g. in cases where a user handler attempts to change the page and the activateEvent
+         * handler immediately changes it back
+         */
+        activateEvent: {
+          type: String,
+          value: null
+        }
+
+      },
+
+      observers: [
+        '_selectedPageChanged(selected)',
+        '_selectedItemChanged(selectedItem)'
+
+      ],
+
+      _selectedPageChanged: function() {
+        this.async(this.notifyResize);
+      },
+
+      /**
+       * Fired just before importHref is called.
+       *
+       * @event progressive-load-start
+       * @detail {{path: String}}
+       */
+
+      /**
+       * Fired if the importHref is successful.
+       *
+       * @event progressive-load-complete
+       * @detail {{response: Object}}
+       */
+
+      /**
+       * Fired if the importHref fails.
+       *
+       * @event progressive-load-error
+       * @detail {{error: Object}}
+       */
+
+      _selectedItemChanged: function(selectedItem) {
+
+        //Nothing to do if the selectedItem is null or is already imported
+        if(!selectedItem || selectedItem.imported == true) {
+          return;
+        }
+
+        var path = selectedItem.getAttribute('path') || selectedItem.path;
+        if (!path) {
+          // ... check path$ to work around a Polymer issue, where a $= attribute
+          // without [[]] or {{}} is not computed.
+          path = selectedItem.getAttribute('path$');
+        }
+
+        //Nothing to do if path attribute is not provided
+        if(!path) {
+          return;
+        }
+
+        this.fire('progressive-load-start', {path: path});
+        Polymer.Base.importHref(path, function(response) {
+          this.fire('progressive-load-complete', {response: response});
+        }.bind(this), function(err) {
+          this.fire('progressive-load-error', {error: err});
+        }.bind(this))
+      }
+
+    });
+  })();
+
+  </script>
+</dom-module>
