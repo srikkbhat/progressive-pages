@@ -47,6 +47,6 @@ Example:
                 ]
               });
             })();
-          <\/script>
+          </script>
         </dom-module>
 ```
