@@ -4,6 +4,7 @@ _[Demo and API docs](https://srikkbhat.github.io/progressive-pages)_
 
 `progressive-pages` is used to select one of its children to show. One use is to cycle through a list of
 children "pages". It attempts to import the selected element using path attribute if provided.
+Try this with [progressive-vulcans](https://srikkbhat/progressive-vulcans), which can use used to create incremental vulcanized files.
 
 Example:
 
