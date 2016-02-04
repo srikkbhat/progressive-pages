@@ -15,6 +15,7 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
       }
     </style>
     <div>Page two</div>
+    <div>Exit Count: {{exitCount}}</div>
   </template>
   <script>
     (function() {
@@ -22,7 +23,16 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
         is: 'my-page-two',
         behaviors: [
           ProgressivePages.PageBehavior
-        ]
+        ],
+        properties: {
+          exitCount: {
+            type: Number,
+            value: 0
+          }
+        },
+        _onPageUnload: function() {
+          this.exitCount += 1;
+        }
       });
     })();
   </script>

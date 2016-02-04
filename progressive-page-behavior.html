@@ -11,14 +11,25 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
 
   /**
   Use `ProgressivePages.PageBehavior` to implement a page to be lazy loaded by `progressive-pages`
+  It also provides access to a functions `_onPageLoad` and `_onPageUnload` which can be used to
+  write custom code to run when the page is selected and deselected.
 
   Example:
 
             Polymer({
               is: 'my-page-one',
+
               behaviors: [
                 ProgressivePages.PageBehavior
-              ]
+              ],
+
+              _onPageLoad: function() {
+                //The code written here will run when the page is selected.
+              },
+
+              _onPageUnload: function() {
+                //The code written here that will run when the page is deselected
+              }
             });
 
   @demo demo/index.html
@@ -36,8 +47,37 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
         readOnly: true,
         type: Boolean,
         value: true
+      },
+
+      /**
+       * The showing attribute is toggled by the progressive-pages based on
+       * whether the page is selected or deselected.
+       */
+       showing: {
+         observer: '_showingChanged',
+         type: Boolean
+       }
+    },
+
+    _showingChanged: function(showing) {
+      if(showing == true) {
+        this._onPageLoad();
+      } else {
+        this._onPageUnload();
       }
-    }
+    },
+
+    /**
+     * Implement this function in the consumed element to execute code
+     * when page is selected
+     */
+     _onPageLoad: function() {},
+
+    /**
+     * Implement this function in the consumed element to execute code
+     * when page is deselected
+     */
+     _onPageUnload: function() {}
   }
 
 </script>

@@ -66,6 +66,15 @@ Example:
         activateEvent: {
           type: String,
           value: null
+        },
+
+        /**
+         * Override the property with default value and mark it as read only.
+         */
+        selectedAttribute: {
+          readOnly: true,
+          type: String,
+          value: 'showing'
         }
 
       },

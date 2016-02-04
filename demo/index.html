@@ -27,15 +27,16 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
 </head>
 <body unresolved>
   <div class="vertical-section-container centered">
-    <h3>progressive-pages shows only one of its children at a time. And lazy loads the items
-        in the path attribute</h3>
+    <h3>progressive-pages shows only one of its children at a time and lazy loads the items
+        in the path attribute. PageBehavior provides hooks to run custom code when the page is
+        selected and deselected</h3>
     <demo-snippet>
       <template>
         <style is="custom-style">
           progressive-pages {
             width: 100%;
             height: 200px;
-            font-size: 50px;
+            font-size: 20px;
             color: white;
             text-align: center;
           }
@@ -44,9 +45,9 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
         <progressive-pages selected="0">
           <my-page-one path$="my-page-one.html"></my-page-one>
           <my-page-two path$="my-page-two.html"></my-page-two>
-          <!--my-page-three pre imported with path attribute -->
+          <!--my-page-three pre imported and also has path attribute -->
           <my-page-three path$="my-page-three.html"></my-page-three>
-          <!--my-page-four pre imported withtout path attribute -->
+          <!--my-page-four pre imported and does not have path attribute -->
           <my-page-four></my-page-four>
           <!--my-page-five import is invalid-->
           <my-page-five path$="my-page-five.html"></my-page-five>

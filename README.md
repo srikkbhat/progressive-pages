@@ -1,4 +1,4 @@
-_[Demo and API Docs](https://srikkbhat.github.io/progressive-pages)_
+_[Demo and API docs](https://srikkbhat.github.io/progressive-pages)_
 
 ##&lt;progressive-pages&gt;
 
@@ -25,7 +25,8 @@ Example:
 
 ##ProgressivePages.PageBehavior
 
-Use `ProgressivePages.PageBehavior` to implement a page to be lazy loaded by `progressive-pages`
+Use `ProgressivePages.PageBehavior` to implement a page to be lazy loaded by `progressive-pages`.
+It also provides access to a functions `_onPageLoad` and `_onPageUnload` which can be used to write custom code that will run when the page is selected and deselected.
 
 Example:
 ```html
@@ -36,15 +37,26 @@ Example:
                 display: block;
               }
             </style>
+
             <p>Page one</p>
           </template>
           <script>
             (function() {
               Polymer({
+
                 is: 'my-page-one',
+
                 behaviors: [
                   ProgressivePages.PageBehavior
-                ]
+                ],
+
+                _onPageLoad: function() {
+                  //The code written here will run when the page is selected.
+                },
+
+                _onPageUnload: function() {
+                  //The code written here will run when the page is deselected.
+                }
               });
             })();
           </script>
