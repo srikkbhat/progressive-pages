@@ -11,7 +11,7 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
 
   /**
   Use `ProgressivePages.PageBehavior` to implement a page to be lazy loaded by `progressive-pages`
-  It also provides access to a functions `_onPageLoad` and `_onPageUnload` which can be used to
+  It also provides access to a functions `_onPageEntry` and `_onPageExit` which can be used to
   write custom code to run when the page is selected and deselected.
 
   Example:
@@ -23,11 +23,11 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
                 ProgressivePages.PageBehavior
               ],
 
-              _onPageLoad: function() {
+              _onPageEntry: function() {
                 //The code written here will run when the page is selected.
               },
 
-              _onPageUnload: function() {
+              _onPageExit: function() {
                 //The code written here that will run when the page is deselected
               }
             });
@@ -61,9 +61,9 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
 
     _showingChanged: function(showing) {
       if(showing == true) {
-        this._onPageLoad();
+        this._onPageEntry();
       } else {
-        this._onPageUnload();
+        this._onPageExit();
       }
     },
 
@@ -71,13 +71,13 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
      * Implement this function in the consumed element to execute code
      * when page is selected
      */
-     _onPageLoad: function() {},
+     _onPageEntry: function() {},
 
     /**
      * Implement this function in the consumed element to execute code
      * when page is deselected
      */
-     _onPageUnload: function() {}
+     _onPageExit: function() {}
   }
 
 </script>
