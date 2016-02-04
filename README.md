@@ -4,23 +4,45 @@ _[Demo and API docs](https://srikkbhat.github.io/progressive-pages)_
 
 `progressive-pages` is used to select one of its children to show. One use is to cycle through a list of
 children "pages". It attempts to import the selected element using path attribute if provided.
-Try this with [progressive-vulcans](https://srikkbhat/progressive-vulcans), which can use used to create incremental vulcanized files.
+It can also be used to stamp the element into the page only after successful import using combination of link
+attribute and `dom-if`. See demo for more details. Try this with [progressive-vulcans](https://github.com/srikkbhat/progressive-vulcans), 
+which can use used to create incremental vulcanized files.
 
 Example:
 
 ```html
-  <progressive-pages selected="0">
-    <my-page-one path$="path/to/my-page-one.html"></my-page-one>
-    <my-page-two path$="path/to/my-page-two.html"></my-page-two>
-    <my-page-three path$="path/to/my-page-three.html"></my-page-three>
-  </progressive-pages>
+    <template is="dom-bind" id="app">
+      <progressive-pages selected="{{selected}}" id="pages">
+        <div path$="path/to/my-page-one.html" link$="3"></div>
+        <div path$="path/to/my-page-two.html" link$="4"></div>
+        <div path$="path/to/my-page-three.html" link$="5"></div>
+        <template is="dom-if" if="{{_equal(selected, '3')}}">
+          <my-page-one></my-page-one>
+        </template>
+        <template is="dom-if" if="{{_equal(selected, '4')}}">
+          <my-page-two></my-page-two>
+        </template>
+        <template is="dom-if" if="{{_equal(selected, '5')}}">
+          <my-page-three></my-page-three>
+        </template>
+      </progressive-pages>
+    </template>
 
-  <script>
-    document.addEventListener('click', function(e) {
-      var pages = document.querySelector('progressive-pages');
-      pages.selectNext();
-    });
-  </script>
+    <script>
+      var app = document.querySelector('#app');
+      var pages = app.$.pages;
+      app._equal = function(a, b) {
+        return a == b;
+      };
+      pages.select('0');
+      app.addEventListener('click', function(e) {
+        if (pages.selected == '2' ) {
+          pages.select('0');
+        } else {
+          pages.selectNext();
+      });
+
+    </script>
 ```
 
 

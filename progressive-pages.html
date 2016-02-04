@@ -10,20 +10,42 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
 <!--
 `progressive-pages` is used to select one of its children to show. One use is to cycle through a list of
 children "pages". It attempts to import the selected element using path attribute if provided.
+The element imported can be wrapped inside a dom-if and will be stamped only after successful
+import using link attribute. See demo for example.
 
 Example:
 
-    <progressive-pages selected="0">
-      <my-page-one path$="path/to/my-page-one.html"></my-page-one>
-      <my-page-two path$="path/to/my-page-two.html"></my-page-two>
-      <my-page-three path$="path/to/my-page-three.html"></my-page-three>
-    </progressive-pages>
+    <template is="dom-bind" id="app">
+      <progressive-pages selected="{{selected}}" id="pages">
+        <div path$="path/to/my-page-one.html" link$="3"></div>
+        <div path$="path/to/my-page-two.html" link$="4"></div>
+        <div path$="path/to/my-page-three.html" link$="5"></div>
+        <template is="dom-if" if="{{_equal(selected, '3')}}">
+          <my-page-one></my-page-one>
+        </template>
+        <template is="dom-if" if="{{_equal(selected, '4')}}">
+          <my-page-two></my-page-two>
+        </template>
+        <template is="dom-if" if="{{_equal(selected, '5')}}">
+          <my-page-three></my-page-three>
+        </template>
+      </progressive-pages>
+    </template>
 
     <script>
-      document.addEventListener('click', function(e) {
-        var pages = document.querySelector('progressive-pages');
-        pages.selectNext();
+      var app = document.querySelector('#app');
+      var pages = app.$.pages;
+      app._equal = function(a, b) {
+        return a == b;
+      };
+      pages.select('0');
+      app.addEventListener('click', function(e) {
+        if (pages.selected == '2' ) {
+          pages.select('0');
+        } else {
+          pages.selectNext();
       });
+
     </script>
 
 @demo demo/index.html
@@ -89,6 +111,10 @@ Example:
         this.async(this.notifyResize);
       },
 
+      _getAttribute: function(item, attr) {
+        return item.getAttribute(attr) || item[attr] || item.getAttribute(attr+'$');
+      },
+
       /**
        * Fired just before importHref is called.
        *
@@ -112,17 +138,23 @@ Example:
 
       _selectedItemChanged: function(selectedItem) {
 
-        //Nothing to do if the selectedItem is null or is already imported
-        if(!selectedItem || selectedItem.imported == true) {
+        //Nothing to do if the selectedItem is null
+        if(!selectedItem) {
           return;
         }
 
-        var path = selectedItem.getAttribute('path') || selectedItem.path;
-        if (!path) {
-          // ... check path$ to work around a Polymer issue, where a $= attribute
-          // without [[]] or {{}} is not computed.
-          path = selectedItem.getAttribute('path$');
+        var link = this._getAttribute(selectedItem, 'link');
+
+        //If selectedItem is imported then goto link if provided or do nothing.
+        if(selectedItem.hasAttribute('imported') || selectedItem.imported == true) {
+          if(link) {
+            this.select(link)
+          }
+          return;
         }
+
+        //If selectedItem imported is not set then attempt to import the path
+        var path = this._getAttribute(selectedItem, 'path');
 
         //Nothing to do if path attribute is not provided
         if(!path) {
@@ -131,7 +163,11 @@ Example:
 
         this.fire('progressive-load-start', {path: path});
         Polymer.Base.importHref(path, function(response) {
+          Polymer.dom(selectedItem).setAttribute('imported', true);
           this.fire('progressive-load-complete', {response: response});
+          if(link) {
+            this.select(link);
+          }
         }.bind(this), function(err) {
           this.fire('progressive-load-error', {error: err});
         }.bind(this))

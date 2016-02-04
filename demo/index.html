@@ -28,8 +28,9 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
 <body unresolved>
   <div class="vertical-section-container centered">
     <h3>progressive-pages shows only one of its children at a time and lazy loads the items
-        in the path attribute. PageBehavior provides hooks to run custom code when the page is
-        selected and deselected</h3>
+        in the path attribute. It can also be used to stamp the element only after successful import using
+        combination of link attribute and dom-if. PageBehavior provides hooks to run custom code when the page is
+        selected and deselected.</h3>
     <demo-snippet>
       <template>
         <style is="custom-style">
@@ -42,15 +43,35 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
           }
         </style>
         <p>Click on a page to advance to the next one.</p>
-        <progressive-pages selected="0">
-          <my-page-one path$="my-page-one.html"></my-page-one>
-          <my-page-two path$="my-page-two.html"></my-page-two>
-          <!--my-page-three pre imported and also has path attribute -->
-          <my-page-three path$="my-page-three.html"></my-page-three>
-          <!--my-page-four pre imported and does not have path attribute -->
-          <my-page-four></my-page-four>
+        <progressive-pages attr-for-selected="data-route" selected="pone">
+          <div data-route="pone" path$="my-page-one.html" link$="apone"></div>
+
+          <div data-route="ptwo" path$="my-page-two.html" link$="aptwo"></div>
+
+          <!--my-page-three pre imported also contains path and link attributes-->
+          <div data-route="pthree" path$="my-page-three.html" link$="apthree"></div>
+
+          <!--my-page-four is pre imported and does not contain path of link attributes-->
+          <my-page-four data-route="pfour"></my-page-four>
+
           <!--my-page-five import is invalid-->
-          <my-page-five path$="my-page-five.html"></my-page-five>
+          <div data-route="pfive" path$="my-page-five.html" link$="apfive"></div>
+
+          <template is="dom-if" if="_equal(selected, 'apone')">
+            <my-page-one data-route="apone"></my-page-one>
+          </template>
+
+          <template is="dom-if" if="_equal(selected, 'aptwo')">
+            <my-page-two data-route="aptwo"></my-page-two>
+          </template>
+
+          <template is="dom-if" if="_equal(selected, 'apthree')">
+            <my-page-three data-route="apthree"></my-page-three>
+          </template>
+
+          <template is="dom-if" if="_equal(selected, 'apfive')">
+            <my-page-five data-route="apfive"></my-page-five>
+          </template>
         </progressive-pages>
         <paper-toast
           id="toastSuccess"
@@ -61,13 +82,19 @@ Copyright (c) 2016 srikkbhat. All rights reserved.
         <script>
           window.addEventListener('WebComponentsReady', function() {
             // imports are loaded and elements have been registered
+            var parr =['pone', 'ptwo', 'pthree', 'pfour', 'pfive'];
+            var ix = 1;
 
             var pages = document.querySelector('progressive-pages');
             var success = document.querySelector('#toastSuccess');
             var error = document.querySelector('#toastError');
 
             document.addEventListener('click', function(e) {
-              pages.selectNext();
+              pages.select(parr[ix]);
+              ix++;
+              if(ix == 5) {
+                ix = 0;
+              }
             });
 
             document.addEventListener('progressive-load-complete', function(e) {
