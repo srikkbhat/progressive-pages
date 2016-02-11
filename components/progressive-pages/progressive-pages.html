@@ -1,0 +1,180 @@
+<!--
+@license
+Copyright (c) 2016 srikkbhat. All rights reserved.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../iron-selector/iron-selectable.html">
+
+<!--
+`progressive-pages` is used to select one of its children to show. One use is to cycle through a list of
+children "pages". It attempts to import the selected element using path attribute if provided.
+The element imported can be wrapped inside a dom-if and will be stamped only after successful
+import using link attribute. See demo for example.
+
+Example:
+
+    <template is="dom-bind" id="app">
+      <progressive-pages selected="{{selected}}" id="pages">
+        <div path$="path/to/my-page-one.html" link$="3"></div>
+        <div path$="path/to/my-page-two.html" link$="4"></div>
+        <div path$="path/to/my-page-three.html" link$="5"></div>
+        <template is="dom-if" if="{{_equal(selected, '3')}}">
+          <my-page-one></my-page-one>
+        </template>
+        <template is="dom-if" if="{{_equal(selected, '4')}}">
+          <my-page-two></my-page-two>
+        </template>
+        <template is="dom-if" if="{{_equal(selected, '5')}}">
+          <my-page-three></my-page-three>
+        </template>
+      </progressive-pages>
+    </template>
+
+    <script>
+      var app = document.querySelector('#app');
+      var pages = app.$.pages;
+      app._equal = function(a, b) {
+        return a == b;
+      };
+      pages.select('0');
+      app.addEventListener('click', function(e) {
+        if (pages.selected == '2' ) {
+          pages.select('0');
+        } else {
+          pages.selectNext();
+      });
+
+    </script>
+
+@demo demo/index.html
+-->
+
+<dom-module id="progressive-pages">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
+
+    <content></content>
+
+  </template>
+  <script>
+  (function() {
+
+    Polymer({
+
+      is: 'progressive-pages',
+
+      behaviors: [
+        Polymer.IronResizableBehavior,
+        Polymer.IronSelectableBehavior
+      ],
+
+      properties: {
+
+        /**
+         * As the selected page is the only one visible, activateEvent is both non-sensical and problematic;
+         * e.g. in cases where a user handler attempts to change the page and the activateEvent
+         * handler immediately changes it back
+         */
+        activateEvent: {
+          type: String,
+          value: null
+        },
+
+        /**
+         * Override the property with default value and mark it as read only.
+         */
+        selectedAttribute: {
+          readOnly: true,
+          type: String,
+          value: 'showing'
+        }
+
+      },
+
+      observers: [
+        '_selectedPageChanged(selected)',
+        '_selectedItemChanged(selectedItem)'
+
+      ],
+
+      _selectedPageChanged: function() {
+        this.async(this.notifyResize);
+      },
+
+      _getAttribute: function(item, attr) {
+        return item.getAttribute(attr) || item[attr] || item.getAttribute(attr+'$');
+      },
+
+      /**
+       * Fired just before importHref is called.
+       *
+       * @event progressive-load-start
+       * @detail {{path: String}}
+       */
+
+      /**
+       * Fired if the importHref is successful.
+       *
+       * @event progressive-load-complete
+       * @detail {{response: Object}}
+       */
+
+      /**
+       * Fired if the importHref fails.
+       *
+       * @event progressive-load-error
+       * @detail {{error: Object}}
+       */
+
+      _selectedItemChanged: function(selectedItem) {
+
+        //Nothing to do if the selectedItem is null
+        if(!selectedItem) {
+          return;
+        }
+
+        var link = this._getAttribute(selectedItem, 'link');
+
+        //If selectedItem is imported then goto link if provided or do nothing.
+        if(selectedItem.hasAttribute('imported') || selectedItem.imported == true) {
+          if(link) {
+            this.select(link)
+          }
+          return;
+        }
+
+        //If selectedItem imported is not set then attempt to import the path
+        var path = this._getAttribute(selectedItem, 'path');
+
+        //Nothing to do if path attribute is not provided
+        if(!path) {
+          return;
+        }
+
+        this.fire('progressive-load-start', {path: path});
+        Polymer.Base.importHref(path, function(response) {
+          Polymer.dom(selectedItem).setAttribute('imported', true);
+          this.fire('progressive-load-complete', {response: response});
+          if(link) {
+            this.select(link);
+          }
+        }.bind(this), function(err) {
+          this.fire('progressive-load-error', {error: err});
+        }.bind(this))
+      }
+
+    });
+  })();
+
+  </script>
+</dom-module>

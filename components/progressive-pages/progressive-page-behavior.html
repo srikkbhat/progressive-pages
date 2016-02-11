@@ -1,0 +1,83 @@
+<!--
+@license
+Copyright (c) 2016 srikkbhat. All rights reserved.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<script>
+
+  var ProgressivePages = ProgressivePages || {};
+
+  /**
+  Use `ProgressivePages.PageBehavior` to implement a page to be lazy loaded by `progressive-pages`
+  It also provides access to a functions `_onPageEntry` and `_onPageExit` which can be used to
+  write custom code to run when the page is selected and deselected.
+
+  Example:
+
+            Polymer({
+              is: 'my-page-one',
+
+              behaviors: [
+                ProgressivePages.PageBehavior
+              ],
+
+              _onPageEntry: function() {
+                //The code written here will run when the page is selected.
+              },
+
+              _onPageExit: function() {
+                //The code written here that will run when the page is deselected
+              }
+            });
+
+  @demo demo/index.html
+  @polymerBehavior ProgressivePages.PageBehavior
+  */
+
+  ProgressivePages.PageBehavior = {
+
+    properties: {
+
+      /**
+       * The default value  of `true` is applied when the element is imported.
+       */
+      imported: {
+        readOnly: true,
+        type: Boolean,
+        value: true
+      },
+
+      /**
+       * The showing attribute is toggled by the progressive-pages based on
+       * whether the page is selected or deselected.
+       */
+       showing: {
+         observer: '_showingChanged',
+         type: Boolean
+       }
+    },
+
+    _showingChanged: function(showing) {
+      if(showing == true) {
+        this._onPageEntry();
+      } else {
+        this._onPageExit();
+      }
+    },
+
+    /**
+     * Implement this function in the consumed element to execute code
+     * when page is selected
+     */
+     _onPageEntry: function() {},
+
+    /**
+     * Implement this function in the consumed element to execute code
+     * when page is deselected
+     */
+     _onPageExit: function() {}
+  }
+
+</script>
